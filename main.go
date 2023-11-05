@@ -68,9 +68,14 @@ func WritePromFileFriendly(formatter Formatter, dotprom string, t string) error 
 
 func main() {
 	flag.StringVar(&TextFilePath, "path", "/var/lib/node_exporter/textfile_collector", "Where to store the .prom file")
-	flag.StringVar(&PromFileName, "name", "", "Name your .prom with the extension")
-	flag.StringVar(&Format, "format", "goss", "Format of the input data (goss or debugvarz)")
+	flag.StringVar(&PromFileName, "name", "", "Name your .prom with the extension (required)")
+	flag.StringVar(&Format, "format", "goss", "Format of the input data")
 	flag.Parse()
+
+	if PromFileName == "" {
+		fmt.Println("name is required")
+		os.Exit(1)
+	}
 
 	var formatter Formatter
 	switch Format {

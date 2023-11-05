@@ -1,0 +1,52 @@
+{
+    "results": [
+        {
+            "duration": 52102,
+            "err": null,
+            "expected": [
+                "false"
+            ],
+            "found": [
+                "false"
+            ],
+            "human": "",
+            "meta": null,
+            "property": "exists",
+            "resource-id": "/srv/down",
+            "resource-type": "File",
+            "result": 0,
+            "skipped": false,
+            "successful": true,
+            "summary-line": "File: /srv/down: exists: matches expectation: [false]",
+            "test-type": 0,
+            "title": ""
+        },
+        {
+            "duration": 523689683,
+            "err": null,
+            "expected": [
+                "200"
+            ],
+            "found": [
+                "200"
+            ],
+            "human": "",
+            "meta": null,
+            "property": "status",
+            "resource-id": "http://httpbun.org/get",
+            "resource-type": "HTTP",
+            "result": 0,
+            "skipped": false,
+            "successful": true,
+            "summary-line": "HTTP: http://httpbun.org/get: status: matches expectation: [200]",
+            "test-type": 0,
+            "title": ""
+        }
+    ],
+    "summary": {
+        "failed-count": 0,
+        "summary-line": "Count: 2, Failed: 0, Duration: 0.524s",
+        "test-count": 2,
+        "total-duration": 523920650
+    }
+}
