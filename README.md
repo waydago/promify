@@ -120,4 +120,7 @@ goss_result_http_duration{property="http://httpbun.org/get",resource="status",sk
 goss_results_summary{textfile="t.prom",name="tested"} 2
 goss_results_summary{textfile="t.prom",name="failed"} 0
 goss_results_summary{textfile="t.prom",name="duration"} 523920650
-```bash
+```
+
+We hope you find Promify useful for your projects. Feel free to contribute and enhance its capabilities even further!
+
