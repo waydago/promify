@@ -1,14 +1,14 @@
 
 # Promify
 
-Promify is a refactored and enhanced version of the [promify-goss](https://github.com/waydago/promify-goss) project. It has been redesigned to be a pipe-only program, providing a flexible and efficient way to handle input sources. We have also added a Formatter interface, allowing for a modular approach to the input source. Promify defaults to the `goss` format, however, you may choose to add "debugvarz" etc as an input source allowing for a more flexible and modular approach to the input source.
+Promify is a refactored and enhanced version of the [promify-goss](https://github.com/waydago/promify-goss) project. It has been redesigned to be a pipe-only program, providing a flexible and efficient way to handle input sources. We have also added a formatter interface, allowing for a modular approach to the input source. Promify defaults to the `goss` format, however, you may choose to add "debugvarz" etc as an input source allowing for a more flexible and modular approach to the input source.
 
 ## Key Features
 
 - **Pipe-Only Input**: Promify requires the input source to be piped, ensuring a smooth data flow and easy integration with other tools.
 - **Required Name Flag**: The `name` flag is mandatory when running Promify. This ensures that the output file is identifiable and can be easily located.
 - **Optional Directory Flag**: The `path` flag is optional. If not specified, Promify will use Node Exporter's default `textfile_collector` directory "/var/lib/node_exporter/textfile_collector".
-- **Modular Input Formats**: One of the major enhancements in Promify is the adding the Formatter interface. Promify defaults to the `goss` format, however, you may choose to add "debugvarz" etc as an input source allowing for a more flexible and modular approach to the input source.
+- **Modular Input Formats**: One of the major enhancements in Promify is the adding the formatter interface. Promify defaults to the `goss` format, however, you may choose to add "debugvarz" etc as an input source allowing for a more flexible and modular approach to the input source.
 
 ## Basic Usage
 
@@ -121,6 +121,23 @@ goss_results_summary{textfile="t.prom",name="tested"} 2
 goss_results_summary{textfile="t.prom",name="failed"} 0
 goss_results_summary{textfile="t.prom",name="duration"} 523920650
 ```
+## Using the Taskfile
 
-We hope you find Promify useful for your projects. Feel free to contribute and enhance its capabilities even further!
+This project uses a `Taskfile.yaml` for task running. The `Taskfile.yaml` includes tasks for cleaning, linting, testing, building, and intalling for the application.
+
+Here are some of the tasks you can run:
+
+- `task clean`: Removes the built binary and any linked files.
+- `task lint`: Runs the linter on the Go source code.
+- `task test`: Runs the Go tests.
+- `task build`: Builds the Go application.
+- `task install`: Installs the application to `/usr/local/bin/` (requires access to sudo).
+
+For example, to build the application, you would run `task build`.
+
+Note: You need to have the [Task](https://taskfile.dev/#/installation) task runner installed to use these tasks.
+
+Thank you for using Promify! We hope it's been helpful for your projects. If you have any feedback or ideas for how we can improve it, please let us know by opening an issue on our GitHub repository.
+
+We also welcome contributions from the community if you're interested in helping out. We appreciate any help we can get to make Promify even better.
 
