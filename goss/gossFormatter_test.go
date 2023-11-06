@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func createTestData() ([]byte, *GossFormatter) {
+func createTestData() ([]byte, *Formatter) {
 	data := []byte(`{
 		"results": [{
 			"duration": 10,
@@ -27,7 +27,7 @@ func createTestData() ([]byte, *GossFormatter) {
 		}
 	}`)
 
-	formatter := &GossFormatter{}
+	formatter := &Formatter{}
 
 	return data, formatter
 }
@@ -50,8 +50,8 @@ func TestGossFormatter_Unmarshal(t *testing.T) {
 	}
 }
 
-var formatter = &GossFormatter{
-	GossResults: GossResults{
+var formatter = &Formatter{
+	Results: Results{
 		Tested: &[]Tested{
 			{
 				Duration:     10,

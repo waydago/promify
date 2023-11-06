@@ -9,8 +9,8 @@ import (
 )
 
 func parseFlags() {
-	flag.StringVar(&TextFilePath, "path", "", "Path to the text file")
-	flag.StringVar(&PromFileName, "name", "", "Name of the prom file")
+	flag.StringVar(&textFilePath, "path", "", "Path to the text file")
+	flag.StringVar(&promFileName, "name", "", "Name of the prom file")
 	flag.Parse()
 }
 
@@ -23,11 +23,11 @@ func TestMainFlags(t *testing.T) {
 	parseFlags()
 
 	// Check if the flags were correctly parsed
-	if TextFilePath != "/test/path" {
-		t.Errorf("Expected path '/test/path', but got '%s'", TextFilePath)
+	if textFilePath != "/test/path" {
+		t.Errorf("Expected path '/test/path', but got '%s'", textFilePath)
 	}
-	if PromFileName != "test_name" {
-		t.Errorf("Expected name 'test_name', but got '%s'", PromFileName)
+	if promFileName != "test_name" {
+		t.Errorf("Expected name 'test_name', but got '%s'", promFileName)
 	}
 }
 func TestLoadPipedData(t *testing.T) {
@@ -40,10 +40,13 @@ func TestLoadPipedData(t *testing.T) {
 	os.Stdin = r
 	go func() {
 		defer w.Close()
-		w.WriteString(content)
+		_, err := w.WriteString(content)
+		if err != nil {
+			t.Errorf("Unexpected error: %s", err.Error())
+		}
 	}()
 
-	result := LoadPipedData()
+	result := loadPipedData()
 	if string(result) != content {
 		t.Errorf("Expected '%s', but got '%s'", content, string(result))
 	}
@@ -51,7 +54,7 @@ func TestLoadPipedData(t *testing.T) {
 
 func TestValidateJSON(t *testing.T) {
 	content := `{"test": "test"}`
-	result, err := ValidateJSON([]byte(content), &goss.GossFormatter{})
+	result, err := ValidateJSON([]byte(content), &goss.Formatter{})
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())
 	}
@@ -62,7 +65,7 @@ func TestValidateJSON(t *testing.T) {
 
 func TestUnmarshalResultsJSON(t *testing.T) {
 	content := `{"test": "test"}`
-	err := UnmarshalResultsJSON([]byte(content), &goss.GossFormatter{})
+	err := unmarshalResultsJSON([]byte(content), &goss.Formatter{})
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err.Error())
 	}

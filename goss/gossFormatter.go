@@ -7,15 +7,18 @@ import (
 	"strings"
 )
 
-type GossFormatter struct {
-	GossResults
+// Formatter is a struct that holds the results of a goss test
+type Formatter struct {
+	Results
 }
 
-type GossResults struct {
+// Results is a struct that separates the summary from the individual test results
+type Results struct {
 	Tested  *[]Tested `json:"results,omitempty"`
 	Summary *Summary  `json:"summary,omitempty"`
 }
 
+// Tested is a struct that holds the individual test results of a goss test
 type Tested struct {
 	Duration     int64    `json:"duration,omitempty"`
 	Expected     []string `json:"expected,omitempty"`
@@ -29,18 +32,21 @@ type Tested struct {
 	TestType     int64    `json:"test-type,omitempty"`
 }
 
+// Summary is a struct that holds the summary of a goss test
 type Summary struct {
 	FailedCount   int64 `json:"failed-count,omitempty"`
 	TestCount     int64 `json:"test-count,omitempty"`
 	TotalDuration int64 `json:"total-duration,omitempty"`
 }
 
-func (g *GossFormatter) Unmarshal(data []byte) error {
-	return json.Unmarshal(data, &g.GossResults)
+// Unmarshal parses the JSON-encoded data and stores the result in the value pointed to by g.Results
+func (g *Formatter) Unmarshal(data []byte) error {
+	return json.Unmarshal(data, &g.Results)
 }
 
-func ValidateJSON(data []byte) (*GossResults, error) {
-	var results GossResults
+// ValidateJSON checks if the provided input is a valid JSON
+func ValidateJSON(data []byte) (*Results, error) {
+	var results Results
 	err := json.Unmarshal(data, &results)
 	if err != nil {
 		return nil, fmt.Errorf("invalid JSON data: %w", err)
@@ -48,31 +54,43 @@ func ValidateJSON(data []byte) (*GossResults, error) {
 	return &results, nil
 }
 
-func (g *GossFormatter) FormatPromFriendly(f *os.File, t string) error {
+func errorCheck(err error) {
+	if err != nil {
+		fmt.Println("error writing to file: %w", err)
+	}
+}
+
+// FormatPromFriendly writes the results of a goss test to a file in a format that Prometheus can read
+func (g *Formatter) FormatPromFriendly(f *os.File, t string) error {
 	for _, result := range *g.Tested {
-		var resourceId string
+		var resourceID string
 
 		switch result.ResourceType {
 		case "Addr":
-			resourceId = result.ResourceID
+			resourceID = result.ResourceID
 		case "Command":
-			commandId := strings.Split(result.ResourceID, "|")
-			resourceId = strings.TrimRight(strings.Replace(commandId[0], " -", "", -1), " ")
+			commandID := strings.Split(result.ResourceID, "|")
+			resourceID = strings.TrimRight(strings.Replace(commandID[0], " -", "", -1), " ")
 		case "Process":
-			resourceId = strings.ReplaceAll(result.ResourceID, "/", "_")
+			resourceID = strings.ReplaceAll(result.ResourceID, "/", "_")
 		default:
-			resourceId = result.ResourceID
+			resourceID = result.ResourceID
 		}
 
-		f.WriteString(fmt.Sprintf("goss_result_%v{property=\"%v\",resource=\"%v\",skipped=\"%t\"} %v\n",
-			strings.ToLower(result.ResourceType), resourceId, result.Property, result.Skipped, result.Result))
-		f.WriteString(fmt.Sprintf("goss_result_%v_duration{property=\"%v\",resource=\"%v\",skipped=\"%t\"} %v\n",
-			strings.ToLower(result.ResourceType), resourceId, result.Property, result.Skipped, result.Duration))
+		_, err := f.WriteString(fmt.Sprintf("goss_result_%v{property=\"%v\",resource=\"%v\",skipped=\"%t\"} %v\n",
+			strings.ToLower(result.ResourceType), resourceID, result.Property, result.Skipped, result.Result))
+		errorCheck(err)
+		_, err = f.WriteString(fmt.Sprintf("goss_result_%v_duration{property=\"%v\",resource=\"%v\",skipped=\"%t\"} %v\n",
+			strings.ToLower(result.ResourceType), resourceID, result.Property, result.Skipped, result.Duration))
+		errorCheck(err)
 	}
 
-	f.WriteString(fmt.Sprintf("goss_results_summary{textfile=\"%v\",name=\"tested\"} %v\n", t, g.Summary.TestCount))
-	f.WriteString(fmt.Sprintf("goss_results_summary{textfile=\"%v\",name=\"failed\"} %v\n", t, g.Summary.FailedCount))
-	f.WriteString(fmt.Sprintf("goss_results_summary{textfile=\"%v\",name=\"duration\"} %v\n", t, g.Summary.TotalDuration))
+	_, err := f.WriteString(fmt.Sprintf("goss_results_summary{textfile=\"%v\",name=\"tested\"} %v\n", t, g.Summary.TestCount))
+	errorCheck(err)
+	_, err = f.WriteString(fmt.Sprintf("goss_results_summary{textfile=\"%v\",name=\"failed\"} %v\n", t, g.Summary.FailedCount))
+	errorCheck(err)
+	_, err = f.WriteString(fmt.Sprintf("goss_results_summary{textfile=\"%v\",name=\"duration\"} %v\n", t, g.Summary.TotalDuration))
+	errorCheck(err)
 
 	return nil
 }

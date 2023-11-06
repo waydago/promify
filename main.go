@@ -12,9 +12,11 @@ import (
 	"github.com/waydago/promify/goss"
 )
 
-var Format, TextFilePath, PromFileName string
+var format string
+var textFilePath string
+var promFileName string
 
-func CheckIfPiped() bool {
+func checkIfPiped() bool {
 	fi, err := os.Stdin.Stat()
 	if err != nil {
 		log.Println(err)
@@ -22,14 +24,14 @@ func CheckIfPiped() bool {
 	}
 	if fi.Mode()&os.ModeNamedPipe != 0 {
 		return true
-	} else {
-		fmt.Println("Program must be called as a pipe")
-		return false
 	}
+
+	fmt.Println("Program must be called as a pipe")
+	return false
 
 }
 
-func LoadPipedData() []byte {
+func loadPipedData() []byte {
 	var dataPiped bytes.Buffer
 	reader := bufio.NewReader(os.Stdin)
 
@@ -49,12 +51,13 @@ func LoadPipedData() []byte {
 	return dataPiped.Bytes()
 }
 
-type Formatter interface {
+type formatter interface {
 	Unmarshal([]byte) error
 	FormatPromFriendly(*os.File, string) error
 }
 
-func ValidateJSON(data []byte, formatter Formatter) (interface{}, error) {
+// ValidateJSON checks if the provided input is a valid JSON
+func ValidateJSON(data []byte, formatter formatter) (interface{}, error) {
 	err := formatter.Unmarshal(data)
 	if err != nil {
 		return nil, fmt.Errorf("invalid JSON data: %w", err)
@@ -62,11 +65,11 @@ func ValidateJSON(data []byte, formatter Formatter) (interface{}, error) {
 	return formatter, nil
 }
 
-func UnmarshalResultsJSON(data []byte, formatter Formatter) error {
+func unmarshalResultsJSON(data []byte, formatter formatter) error {
 	return formatter.Unmarshal(data)
 }
 
-func WritePromFileFriendly(formatter Formatter, dotprom string, t string) error {
+func writePromFileFriendly(formatter formatter, dotprom string, t string) error {
 	f, err := os.Create(dotprom)
 	if err != nil {
 		return err
@@ -82,37 +85,37 @@ func WritePromFileFriendly(formatter Formatter, dotprom string, t string) error 
 }
 
 func main() {
-	flag.StringVar(&TextFilePath, "path", "/var/lib/node_exporter/textfile_collector", "Where to store the .prom file")
-	flag.StringVar(&PromFileName, "name", "", "Name your .prom with the extension (required)")
-	flag.StringVar(&Format, "format", "goss", "Format of the input data")
+	flag.StringVar(&textFilePath, "path", "/var/lib/node_exporter/textfile_collector", "Where to store the .prom file")
+	flag.StringVar(&promFileName, "name", "", "Name your .prom with the extension (required)")
+	flag.StringVar(&format, "format", "goss", "Format of the input data")
 	flag.Parse()
 
-	if PromFileName == "" {
+	if promFileName == "" {
 		fmt.Println("name is required")
 		os.Exit(1)
 	}
 
-	var formatter Formatter
-	switch Format {
+	var formatter formatter
+	switch format {
 	case "goss":
-		formatter = &goss.GossFormatter{}
+		formatter = &goss.Formatter{}
 	default:
-		log.Fatalf("Unsupported format: %s", Format)
+		log.Fatalf("Unsupported format: %s", format)
 	}
 
-	if !CheckIfPiped() {
+	if !checkIfPiped() {
 		os.Exit(1)
 	}
 
-	data := LoadPipedData()
+	data := loadPipedData()
 
-	err := UnmarshalResultsJSON(data, formatter)
+	err := unmarshalResultsJSON(data, formatter)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	File := fmt.Sprintf("%v/%v", TextFilePath, PromFileName)
-	err = WritePromFileFriendly(formatter, File, PromFileName)
+	File := fmt.Sprintf("%v/%v", textFilePath, promFileName)
+	err = writePromFileFriendly(formatter, File, promFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
