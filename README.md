@@ -46,16 +46,7 @@ If your node_exporter deployment has a custom textfile_collector you will need t
 
 ## Input Sources
 
-In our demo.yaml gossfile test we are expecting the file /srv/down not to exist and http://httpbun.org/get to return a 200 respose.
-
-```bash
-$ goss -g ./examples/demo.yaml validate -f tap
-1..2
-ok 1 - File: /srv/down: exists: matches expectation: [false]
-ok 2 - HTTP: http://httpbun.org/get: status: matches expectation: [200]
-```
-
-Below is the data returned with the json outputter. At first glance we can already see json exposes more details about each test.
+In our demo.yaml gossfile test we are expecting the file /srv/down not to exist and http://httpbun.org/get to return a 200 respose. Below is the data returned with the json outputter that we want Promify to convert.
 
 ```bash
 $ goss -g ./examples/demo.yaml validate -f json -o pretty
@@ -113,7 +104,7 @@ $ goss -g ./examples/demo.yaml validate -f json -o pretty
 }
 ```
 
-Now if we inspect the output of the goss formatter we can see that its written as prometheus metrics.
+Now if we inspect the output of `t.prom` it's nicely reformatted into prom friendly metrics.
 
 ```bash
 $ cat examples/demo.json | ./promify -name t.prom -path ./ ; cat t.prom       
