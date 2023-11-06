@@ -11,6 +11,7 @@ import (
 func parseFlags() {
 	flag.StringVar(&textFilePath, "path", "", "Path to the text file")
 	flag.StringVar(&promFileName, "name", "", "Name of the prom file")
+	flag.StringVar(&format, "format", "", "Format of the input data")
 	flag.Parse()
 }
 
@@ -18,7 +19,7 @@ func TestMainFlags(t *testing.T) {
 	origArgs := os.Args
 	defer func() { os.Args = origArgs }()
 
-	os.Args = []string{"cmd", "-path", "/test/path", "-name", "test_name"}
+	os.Args = []string{"cmd", "-path", "/test/path", "-name", "test_name", "-format", "test_format"}
 
 	parseFlags()
 
@@ -28,6 +29,9 @@ func TestMainFlags(t *testing.T) {
 	}
 	if promFileName != "test_name" {
 		t.Errorf("Expected name 'test_name', but got '%s'", promFileName)
+	}
+	if format != "test_format" {
+		t.Errorf("Expected format 'test_format', but got '%s'", format)
 	}
 }
 func TestLoadPipedData(t *testing.T) {
