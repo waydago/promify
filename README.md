@@ -1,9 +1,9 @@
 
 # Promify
 
-Promify is a command-line tool that converts datastreams into Prometheus metrics. It is a refactored and enhanced version of the [promify-goss](https://github.com/waydago/promify-goss) project, with the capability to handle a wider range of input sources. Promify has been redesigned to be a pipe-only program, providing a flexible and efficient way to handle input sources. We have also added a formatter interface, allowing for a modular approach to the input source. Promify currently defaults to the `goss` format, however, you may choose to add any other "Formatter" as long as you satisfy the "Formatter" interface.
+Promify is a command-line tool that converts datastreams into Prometheus metrics. It is a refactored and enhanced version of the [promify-goss](https://github.com/waydago/promify-goss) project, with the capability to handle a wider range of input sources. Promify is designed to be a pipe-only program, providing a flexible and efficient way to handle input sources. We have also added a formatter interface, allowing for a pluggable approach to adding new sources. Promify currently defaults to the `goss` format, but you can add any other "Formatter" as long as you satisfy the "Formatter" interface.
 
-With Promify, you can easily build in your own input source into Prometheus metrics, which can then be scraped by Prometheus via Node Exporters textfile_collector and visualized in Grafana making it an ideal to improve monitoring of your systems and applications mroe effectively. 
+With Promify, you can easily build in your own input source to reformat into Prometheus metrics, which can then be scraped by Prometheus via Node Exporters textfile_collector and visualized in Grafana, making it an ideal tool to improve monitoring of your systems and applications. 
 
 Promify requires the input source to be piped, ensuring a smooth data flow and easy integration with other tools. The `name` flag is mandatory when running Promify. This ensures that the output file is identifiable and can be easily located. The `path` flag is optional. If not specified, Promify will use Node Exporter's default `textfile_collector` directory "/var/lib/node_exporter/textfile_collector".
 
