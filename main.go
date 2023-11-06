@@ -114,8 +114,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	File := fmt.Sprintf("%v/%v", textFilePath, promFileName)
-	err = writePromFileFriendly(formatter, File, promFileName)
+	file := fmt.Sprintf("%v/%v", textFilePath, promFileName)
+	err = writePromFileFriendly(formatter, file, promFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
