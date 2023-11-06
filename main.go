@@ -14,6 +14,21 @@ import (
 
 var Format, TextFilePath, PromFileName string
 
+func CheckIfPiped() bool {
+	fi, err := os.Stdin.Stat()
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	if fi.Mode()&os.ModeNamedPipe != 0 {
+		return true
+	} else {
+		fmt.Println("Program must be called as a pipe")
+		return false
+	}
+
+}
+
 func LoadPipedData() []byte {
 	var dataPiped bytes.Buffer
 	reader := bufio.NewReader(os.Stdin)
@@ -83,6 +98,10 @@ func main() {
 		formatter = &goss.GossFormatter{}
 	default:
 		log.Fatalf("Unsupported format: %s", Format)
+	}
+
+	if !CheckIfPiped() {
+		os.Exit(1)
 	}
 
 	data := LoadPipedData()
