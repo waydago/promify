@@ -1,7 +1,13 @@
 
 # Promify
 
-Promify is a refactored and enhanced version of the [promify-goss](https://github.com/waydago/promify-goss) project. It has been redesigned to be a pipe-only program, providing a flexible and efficient way to handle input sources. We have also added a formatter interface, allowing for a modular approach to the input source. Promify defaults to the `goss` format, however, you may choose to add "debugvarz" etc as an input source allowing for a more flexible and modular approach to the input source.
+Promify is a command-line tool that converts datastreams into Prometheus metrics. It is a refactored and enhanced version of the [promify-goss](https://github.com/waydago/promify-goss) project, with the capability to handle a wider range of input sources. Promify has been redesigned to be a pipe-only program, providing a flexible and efficient way to handle input sources. We have also added a formatter interface, allowing for a modular approach to the input source. Promify currently defaults to the `goss` format, however, you may choose to add any other "Formatter" as long as you satisfy the "Formatter" interface.
+
+With Promify, you can easily build in your own input source into Prometheus metrics, which can then be scraped by Prometheus via Node Exporters textfile_collector and visualized in Grafana making it an ideal to improve monitoring of your systems and applications mroe effectively. 
+
+Promify requires the input source to be piped, ensuring a smooth data flow and easy integration with other tools. The `name` flag is mandatory when running Promify. This ensures that the output file is identifiable and can be easily located. The `path` flag is optional. If not specified, Promify will use Node Exporter's default `textfile_collector` directory "/var/lib/node_exporter/textfile_collector".
+
+Try it out today and see how it can help you improve your monitoring and alerting workflows.
 
 ## Key Features
 
