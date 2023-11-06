@@ -7,18 +7,18 @@ import (
 	"strings"
 )
 
-// Formatter is a struct that holds the results of a goss test
+// Formatter holds the results of a goss test
 type Formatter struct {
 	Results
 }
 
-// Results is a struct that separates the summary from the individual test results
+// Results separates the summary from the individual test results
 type Results struct {
 	Tested  *[]Tested `json:"results,omitempty"`
 	Summary *Summary  `json:"summary,omitempty"`
 }
 
-// Tested is a struct that holds the individual test results of a goss test
+// Tested holds the individual test results of each goss test
 type Tested struct {
 	Duration     int64    `json:"duration,omitempty"`
 	Expected     []string `json:"expected,omitempty"`
@@ -32,7 +32,7 @@ type Tested struct {
 	TestType     int64    `json:"test-type,omitempty"`
 }
 
-// Summary is a struct that holds the summary of a goss test
+// Summary holds the summary of a goss test
 type Summary struct {
 	FailedCount   int64 `json:"failed-count,omitempty"`
 	TestCount     int64 `json:"test-count,omitempty"`
