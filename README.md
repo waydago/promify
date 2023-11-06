@@ -128,8 +128,6 @@ Here are some of the tasks you can run:
 - `task build`: Builds the Go application.
 - `task install`: Installs the application to `/usr/local/bin/` (requires access to sudo).
 
-For example, to build the application, you would run `task build`.
-
 Note: You need to have the [Task](https://taskfile.dev/#/installation) task runner installed to use these tasks.
 
 Thank you for using Promify! We hope it's been helpful for your projects. If you have any feedback or ideas for how we can improve it, please let us know by opening an issue on our GitHub repository.
