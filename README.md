@@ -5,8 +5,6 @@ Promify is a command-line tool that converts datastreams into Prometheus metrics
 
 With Promify, you can easily build in your own input source to reformat into Prometheus metrics, which can then be scraped by Prometheus via Node Exporters textfile_collector and visualized in Grafana, making it an ideal tool to improve monitoring of your systems and applications. 
 
-Promify requires the input source to be piped, ensuring a smooth data flow and easy integration with other tools. The `name` flag is mandatory when running Promify. This ensures that the output file is identifiable and can be easily located. The `path` flag is optional. If not specified, Promify will use Node Exporter's default `textfile_collector` directory "/var/lib/node_exporter/textfile_collector".
-
 Try it out today and see how it can help you improve your monitoring and alerting workflows.
 
 ## Key Features
