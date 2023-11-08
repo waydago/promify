@@ -3,25 +3,30 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
+	"path"
+	"path/filepath"
+	"strings"
 
 	"github.com/waydago/promify/goss"
 )
 
 var format string
-var textFilePath string
-var promFileName string
+var filePath string
+var fileName string
 
-func checkIfPiped() bool {
+func getFromPipe() bool {
 	fi, err := os.Stdin.Stat()
 	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+		fmt.Println(err.Error())
+		return false
 	}
+
 	if fi.Mode()&os.ModeNamedPipe != 0 {
 		return true
 	}
@@ -33,6 +38,7 @@ func checkIfPiped() bool {
 
 func loadPipedData() []byte {
 	var dataPiped bytes.Buffer
+
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
@@ -42,8 +48,7 @@ func loadPipedData() []byte {
 				dataPiped.WriteString(line)
 				break
 			} else {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				log.Fatal(err)
 			}
 		}
 		dataPiped.WriteString(line)
@@ -56,7 +61,6 @@ type formatter interface {
 	FormatPromFriendly(*os.File, string) error
 }
 
-// ValidateJSON checks if the provided input is a valid JSON
 func ValidateJSON(data []byte, formatter formatter) (interface{}, error) {
 	err := formatter.Unmarshal(data)
 	if err != nil {
@@ -84,15 +88,73 @@ func writePromFileFriendly(formatter formatter, dotprom string, t string) error 
 	return nil
 }
 
+func tidyFileName(name string) (string, error) {
+	switch {
+	case name == "" || name == " ":
+		return "", errors.New("name error: argument is empty")
+	case strings.Contains(name, "/"):
+		return "", errors.New("name error: cannot contain '/'")
+	case !strings.HasSuffix(name, ".prom"):
+		return "", errors.New("name error: '.prom' extension is required")
+	default:
+		name = strings.TrimRight(name, " \t\n\r\x0b\x0c")
+		name = strings.TrimLeft(name, " \t\n\r\x0b\x0c")
+	}
+
+	return name, nil
+}
+
+func tidyFilePath(path string) (string, error) {
+	switch {
+	case len(path) == 0 || path == " " || path == "":
+		return "", errors.New("path error: argument is empty")
+	case strings.HasPrefix(path, "..."):
+		return "", errors.New("path error: too many dots '...'")
+	case strings.Contains(path, "//"):
+		return "", errors.New("path error: too many slashes '//'")
+	}
+
+	switch {
+	case strings.HasPrefix(path, "~") || strings.HasPrefix(path, "$HOME"):
+		path = strings.Replace(path, "~", os.Getenv("HOME"), 1)
+	case strings.HasPrefix(path, "../"):
+		path = filepath.Dir(os.Getenv("PWD"))
+	case strings.HasPrefix(path, ".") || !strings.HasPrefix(path, "/"):
+		path = os.Getenv("PWD")
+	default:
+		path = filepath.Clean(path)
+	}
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return "", errors.New("path error: directory does not exist")
+	}
+
+	if !strings.HasSuffix(path, "/") {
+		path = path + "/"
+	}
+
+	return path, nil
+}
+
 func main() {
-	flag.StringVar(&textFilePath, "path", "/var/lib/node_exporter/textfile_collector", "Where to store the .prom file")
-	flag.StringVar(&promFileName, "name", "", "Name your .prom with the extension (required)")
+
+	if !getFromPipe() {
+		log.Fatal("Program must be called as a pipe")
+	}
+
+	flag.StringVar(&filePath, "path", "/var/lib/node_exporter/textfile_collector", "Path to store the .prom file")
+	flag.StringVar(&fileName, "name", "", "Name your .prom with the extension (required)")
 	flag.StringVar(&format, "format", "goss", "Format of the input data")
 	flag.Parse()
 
-	if promFileName == "" {
-		fmt.Println("name is required")
-		os.Exit(1)
+	fileName, err := tidyFileName(fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	filePath, err := tidyFilePath(filePath)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	var formatter formatter
@@ -103,19 +165,16 @@ func main() {
 		log.Fatalf("Unsupported format: %s", format)
 	}
 
-	if !checkIfPiped() {
-		os.Exit(1)
-	}
-
 	data := loadPipedData()
 
-	err := unmarshalResultsJSON(data, formatter)
+	err = unmarshalResultsJSON(data, formatter)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	file := fmt.Sprintf("%v/%v", textFilePath, promFileName)
-	err = writePromFileFriendly(formatter, file, promFileName)
+	file := path.Join(filePath, fileName)
+
+	err = writePromFileFriendly(formatter, file, fileName)
 	if err != nil {
 		log.Fatal(err)
 	}

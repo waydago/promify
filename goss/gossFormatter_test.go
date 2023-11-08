@@ -102,7 +102,7 @@ func TestGossFormatter_FormatPromFriendly(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer os.Remove(tmpfile.Name()) // clean up
+	defer os.Remove(tmpfile.Name())
 
 	err = formatter.FormatPromFriendly(tmpfile, "test")
 	if err != nil {

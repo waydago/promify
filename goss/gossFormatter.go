@@ -39,25 +39,15 @@ type Summary struct {
 	TotalDuration int64 `json:"total-duration,omitempty"`
 }
 
-// Unmarshal parses the JSON-encoded data and stores the result in the value pointed to by g.Results
-func (g *Formatter) Unmarshal(data []byte) error {
-	return json.Unmarshal(data, &g.Results)
-}
-
-// ValidateJSON checks if the provided input is a valid JSON
-func ValidateJSON(data []byte) (*Results, error) {
-	var results Results
-	err := json.Unmarshal(data, &results)
-	if err != nil {
-		return nil, fmt.Errorf("invalid JSON data: %w", err)
-	}
-	return &results, nil
-}
-
 func errorCheck(err error) {
 	if err != nil {
 		fmt.Println("error writing to file: %w", err)
 	}
+}
+
+// Unmarshal parses the JSON-encoded data and stores the result in the value pointed to by g.Results
+func (g *Formatter) Unmarshal(data []byte) error {
+	return json.Unmarshal(data, &g.Results)
 }
 
 // FormatPromFriendly writes the results of a goss test to a file in a format that Prometheus can read

@@ -21,6 +21,7 @@
 go.work
 
 # Other ingnores
+.vscode
 build
 promify
 *.prom
