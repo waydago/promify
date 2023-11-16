@@ -3,7 +3,7 @@
 
 Promify is a command-line tool that converts datastreams into Prometheus metrics. It is a refactored and enhanced version of the [promify-goss](https://github.com/waydago/promify-goss) project, with the capability to handle a wider range of input sources. Promify is designed to be a pipe-only program, providing a flexible and efficient way to handle input sources. We have also added a formatter interface, allowing for a pluggable approach to adding new sources. Promify currently defaults to the `goss` format, but you can add any other "Formatter" as long as you satisfy the "Formatter" interface.
 
-With Promify, you can easily build in your own input source to reformat into Prometheus metrics, which can then be scraped by Prometheus via Node Exporters textfile_collector and visualized in Grafana, making it an ideal tool to improve monitoring of your systems and applications. 
+With Promify, you can easily build in your own input source to reformat into Prometheus metrics, which can then be scraped by Prometheus via Node Exporters textfile_collector and visualized in Grafana, making it an ideal tool to improve monitoring of your systems and applications.
 
 Try it out today and see how it can help you improve your monitoring and alerting workflows.
 
@@ -38,18 +38,19 @@ name is required
 An unspecified `-path` will use the default textfile_collector path shipped by node_exporter.
 
 ```bash
-$ cat examples/demo.json | ./promify -name t.prom -path /tmp
+$~ cat examples/demo.json | ./promify -name t.prom -path /tmp
 ```
+
 In the above example we are using the default goss format and the output file will be named t.prom and stored in /tmp.
 
 If your node_exporter deployment has a custom textfile_collector you will need to specify that path or update your fork of the go code to make your path the default and rebuild the program.
 
 ## Input Sources
 
-In our demo.yaml gossfile test we are expecting the file /srv/down not to exist and http://httpbun.org/get to return a 200 respose. Below is the data returned with the json outputter that we want Promify to convert.
+In our demo.yaml gossfile test we are expecting the file /srv/down not to exist and <http://httpbun.org/get> to return a 200 respose. Below is the data returned with the json outputter that we want Promify to convert.
 
 ```bash
-$ goss -g ./examples/demo.yaml validate -f json -o pretty
+$~ goss -g ./examples/demo.yaml validate -f json -o pretty
 {
     "results": [
         {
@@ -116,6 +117,7 @@ goss_results_summary{textfile="t.prom",name="tested"} 2
 goss_results_summary{textfile="t.prom",name="failed"} 0
 goss_results_summary{textfile="t.prom",name="duration"} 523920650
 ```
+
 ## Using the Taskfile
 
 This project uses a `Taskfile.yaml` for task running. The `Taskfile.yaml` includes tasks for cleaning, linting, testing, building, and intalling for the application.
@@ -133,4 +135,3 @@ Note: You need to have the [Task](https://taskfile.dev/#/installation) task runn
 Thank you for using Promify! We hope it's been helpful for your projects. If you have any feedback or ideas for how we can improve it, please let us know by opening an issue on our GitHub repository.
 
 We also welcome contributions from the community if you're interested in helping out. We appreciate any help we can get to make Promify even better.
-
